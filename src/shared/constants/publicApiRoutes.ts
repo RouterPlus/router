@@ -31,6 +31,8 @@ const PUBLIC_READONLY_API_ROUTE_PREFIXES = [
   "/api/health/ping",
   "/api/monitoring/health",
   "/api/settings/require-login",
+  "/api/docs",
+  "/api/swagger",
 ];
 
 const PUBLIC_READONLY_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);

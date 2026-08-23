@@ -1563,6 +1563,90 @@ paths:
             cost is computed per search-unit when pricing is available,
             otherwise `0` (fail-open).
 
+  /api/docs:
+    get:
+      tags: [System]
+      summary: API documentation (Redoc UI)
+      description: >-
+        Serves an interactive HTML documentation page powered by Redoc. Renders the
+        OpenAPI specification from `/openapi.yaml` in a read-only, searchable format.
+        Ideal for exploring the API surface and understanding request/response schemas.
+        No authentication required.
+      responses:
+        "200":
+          description: HTML page with embedded Redoc viewer
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /api/swagger:
+    get:
+      tags: [System]
+      summary: API documentation (Swagger UI)
+      description: >-
+        Serves an interactive HTML documentation page powered by Swagger UI. Renders the
+        OpenAPI specification from `/openapi.yaml` with "Try it out" functionality for
+        testing endpoints directly from the browser. Supports authentication via Bearer
+        tokens and displays request/response examples. No authentication required to
+        view the documentation.
+      responses:
+        "200":
+          description: HTML page with embedded Swagger UI
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /openapi.yaml:
+    get:
+      tags: [System]
+      summary: OpenAPI specification (YAML)
+      description: >-
+        Returns the raw OpenAPI 3.1.0 specification document in YAML format. This is
+        the canonical API specification that powers both `/api/docs` (Redoc) and
+        `/api/swagger` (Swagger UI). Can be used with any OpenAPI-compatible tools.
+        No authentication required.
+      responses:
+        "200":
+          description: OpenAPI specification document
+          content:
+            application/x-yaml:
+              schema:
+                type: string
+
+  /api/openapi/spec:
+    get:
+      tags: [System]
+      summary: OpenAPI specification (JSON)
+      description: >-
+        Returns the parsed OpenAPI specification as a structured JSON catalog with
+        endpoints grouped by tags, example request bodies, and schema references.
+        Used by the dashboard "Try It" panel to pre-fill requests. No authentication
+        required.
+      responses:
+        "200":
+          description: Structured API catalog
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                  servers:
+                    type: array
+                  tags:
+                    type: array
+                  endpoints:
+                    type: array
+                    items:
+                      type: object
+                  schemas:
+                    type: array
+                    items:
+                      type: string
+
   /api/v1:
     get:
       tags: [System]
