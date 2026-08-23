@@ -1,0 +1,20 @@
+# Diagnostic probe: verifies the self-hosted runner can execute while the
+# GitHub-hosted minute pool is billing-blocked. Safe to delete once resolved.
+name: Self-hosted Probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: self-hosted
+    steps:
+      - name: Probe
+        run: |
+          echo "runner=$(uname -srm)"
+          echo "node=$(node --version 2>/dev/null || echo none)"
+          echo "ip=$(curl -s --max-time 10 ip.me)"
+          nproc
