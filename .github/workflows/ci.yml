@@ -601,15 +601,11 @@ jobs:
 
   build:
     name: Build
-    # Dynamic runner: when the release captain flips the USE_VPS_RUNNER repo var to
-    # 'true' (scripts/vps/release-runner-up.sh does it after the self-hosted VM is
-    # online), the heavy jobs run on the dedicated 32-core VPS runners (label
-    # omni-release) instead of queueing on the 20-concurrent-job hosted pool.
-    # Safety: fork PRs NEVER reach the self-hosted runner — the expression falls
-    # back to ubuntu-latest unless the PR head repo is this repository (push /
-    # dispatch events are own-origin by definition). Any failure path (VM down,
-    # var unset/false) also falls back to ubuntu-latest.
-    runs-on: ${{ (vars.USE_VPS_RUNNER == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)) && fromJSON('["self-hosted","omni-release"]') || 'ubuntu-latest' }}
+    # Self-hosted runner (bore-runner): the Turbopack production build is the heaviest
+    # step in this pipeline and outgrew hosted runners during the v3.8.49 cycle.
+    # Fork PRs do not reach this repo's runners as pull_request runs execute there;
+    # any failure path on the runner itself will queue/fail visibly.
+    runs-on: self-hosted
     needs: changes
     if: ${{ github.event_name != 'pull_request' || (needs.changes.outputs.code == 'true' && github.event.pull_request.draft == false) }}
     steps:
@@ -656,7 +652,7 @@ jobs:
 
   package-artifact:
     name: Package Artifact
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     env:
       JWT_SECRET: ci-build-secret-with-sufficient-length-for-validation

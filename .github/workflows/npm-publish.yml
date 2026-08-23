@@ -268,6 +268,27 @@ jobs:
         timeout-minutes: 30
         run: npm run check:install-upgrade
 
+      # Installable release artifact: pack the tarball AFTER both boot gates
+      # (check:pack-boot + check:install-upgrade) have passed, so only proven-bootable
+      # bytes are attached. scripts/install-latest.sh consumes this asset — users
+      # install the latest release without building anything locally.
+      - name: Pack installable tarball
+        if: steps.resolve.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          npm pack --pack-destination /tmp --silent
+          test -f "/tmp/omniroute-${VERSION}.tgz"
+
+      - name: Attach installable tarball to GitHub Release
+        if: steps.resolve.outputs.skip != 'true' && github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: gh release upload "$TAG" "/tmp/omniroute-${VERSION}.tgz" --clobber
+
       # WS1.3 (D2, v3.8.49 plan): STAGED publishing by default — `npm stage publish`
       # parks the exact bytes on the registry WITHOUT making them installable; the
       # owner then verifies and approves with 2FA (`npm stage approve`), moving the
