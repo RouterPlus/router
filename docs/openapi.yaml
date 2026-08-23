@@ -1615,38 +1615,6 @@ paths:
               schema:
                 type: string
 
-  /api/openapi/spec:
-    get:
-      tags: [System]
-      summary: OpenAPI specification (JSON)
-      description: >-
-        Returns the parsed OpenAPI specification as a structured JSON catalog with
-        endpoints grouped by tags, example request bodies, and schema references.
-        Used by the dashboard "Try It" panel to pre-fill requests. No authentication
-        required.
-      responses:
-        "200":
-          description: Structured API catalog
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  info:
-                    type: object
-                  servers:
-                    type: array
-                  tags:
-                    type: array
-                  endpoints:
-                    type: array
-                    items:
-                      type: object
-                  schemas:
-                    type: array
-                    items:
-                      type: string
-
   /api/v1:
     get:
       tags: [System]
